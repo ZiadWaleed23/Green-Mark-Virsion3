@@ -1,7 +1,3 @@
-/* ============================================================
-   GREEN MARK — Script
-   ============================================================ */
-
 // ---- Preloader ----
 window.addEventListener('load', () => {
   const preloader = document.getElementById('preloader');
@@ -104,7 +100,56 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// ---- Swiper Home Slider ----
+// ---- Services Slider ----
+(function () {
+  const track   = document.getElementById('servicesTrack');
+  const prevBtn = document.getElementById('servicesPrev');
+  const nextBtn = document.getElementById('servicesNext');
+  const dots    = document.querySelectorAll('.services-dot');
+
+  if (!track || !prevBtn || !nextBtn) return;
+
+  const cards = track.querySelectorAll('.service-card');
+  let current = 0;
+
+  function getVisibleCount() {
+    if (window.innerWidth <= 768)  return 1;
+    if (window.innerWidth <= 1100) return 2;
+    return 3;
+  }
+
+  function maxIndex() {
+    return Math.max(0, cards.length - getVisibleCount());
+  }
+
+  function goTo(index) {
+    const vis = getVisibleCount();
+    current = Math.max(0, Math.min(index, maxIndex()));
+
+    // Card width + gap
+    const cardEl   = cards[0];
+    const gap      = parseFloat(getComputedStyle(track).gap) || 24;
+    const cardW    = cardEl.getBoundingClientRect().width;
+    const shift    = current * (cardW + gap);
+
+    track.style.transform = `translateX(-${shift}px)`;
+
+    // Arrows state
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current >= maxIndex();
+
+    // Dots
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  }
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+  dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.index)));
+
+  window.addEventListener('resize', () => goTo(current));
+
+  goTo(0);
+})();
 var swiper = new Swiper(".home-slid", {
   loop: true,
   effect: "fade",
